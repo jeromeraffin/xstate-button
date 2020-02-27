@@ -1,10 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { assign, DoneInvokeEvent, EventObject, Machine } from 'xstate';
 
-import { getCharacters } from '../../services/api';
-
-// function wait(time: number) {
-//   return new Promise((_, reject) => setTimeout(reject, time));
-// }
+import { getError } from '../../services/api';
 
 export interface Context {
   characters: [];
@@ -19,35 +16,36 @@ export interface Schema {
 }
 
 export interface Event extends EventObject {
-  type: "CLICK" | "RETRY";
+  type: 'CLICK' | 'RETRY';
 }
 
 export default Machine<Context, Schema, Event>(
   {
-    id: "machine",
-    initial: "idle",
+    id: 'machine',
+    initial: 'idle',
     context: {
       characters: []
     },
+    // @ts-ignore
     states: {
       idle: {
         on: {
-          CLICK: "fetching"
+          CLICK: 'fetching'
         }
       },
       fetching: {
         invoke: {
-          src: () => getCharacters(),
+          src: () => getError(),
           onDone: {
-            target: "idle",
-            actions: "assignCharacters"
+            target: 'idle',
+            actions: 'assignCharacters'
           },
-          onError: "error"
+          onError: 'error'
         }
       },
       error: {
         on: {
-          RETRY: "fetching"
+          RETRY: 'fetching'
         }
       }
     }

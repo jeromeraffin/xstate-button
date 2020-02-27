@@ -1,30 +1,38 @@
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { useMachine } from '@xstate/react';
 import React from 'react';
+import { useMachine } from '@xstate/react';
+import { Spinner } from 'react-bootstrap';
 
 import machine, { Context, Event } from './core/machine';
+import ToastError from './components/Toast';
 
 function App() {
   const [current, send] = useMachine<Context, Event>(machine, {
     devTools: true
   });
+
+  const fetchingState = current.matches('fetching');
+  const errorState = current.matches('error');
+
   return (
-    <div className="App">
+    <div className='App'>
       <div>
         <h2>
           current state: <span>{current.value}</span>
         </h2>
       </div>
       <button
-        className="Button"
-        disabled={current.matches("fetching")}
-        onClick={() =>
-          current.matches("error") ? send("RETRY") : send("CLICK")
-        }
+        className='Button'
+        disabled={fetchingState}
+        onClick={() => (errorState ? send('RETRY') : send('CLICK'))}
       >
-        {current.matches("error") ? "Retry" : "Click"}
+        {!fetchingState && !errorState && 'Fetch data'}
+        {fetchingState && <Spinner animation='border' />}
+        {errorState && 'Retry please'}
       </button>
+      <ToastError isError={errorState} />
     </div>
   );
 }
