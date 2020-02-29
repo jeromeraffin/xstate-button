@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { assign, DoneInvokeEvent, EventObject, Machine } from 'xstate';
 
-import { getError } from '../../services/api';
+import { getCharacters } from '../../services/api';
 
 export interface Context {
   characters: [];
@@ -26,7 +26,6 @@ export default Machine<Context, Schema, Event>(
     context: {
       characters: []
     },
-    // @ts-ignore
     states: {
       idle: {
         on: {
@@ -35,7 +34,7 @@ export default Machine<Context, Schema, Event>(
       },
       fetching: {
         invoke: {
-          src: () => getError(),
+          src: () => getCharacters(),
           onDone: {
             target: 'idle',
             actions: 'assignCharacters'
@@ -52,7 +51,6 @@ export default Machine<Context, Schema, Event>(
   },
   {
     actions: {
-      //@ts-ignore
       assignCharacters: assign((_, event) => ({
         characters: (event as DoneInvokeEvent<any>).data.results
       }))

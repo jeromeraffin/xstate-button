@@ -7,6 +7,7 @@ import { Spinner } from 'react-bootstrap';
 
 import machine, { Context, Event } from './core/machine';
 import ToastError from './components/Toast';
+import BadButton from './components/BadButton';
 
 function App() {
   const [current, send] = useMachine<Context, Event>(machine, {
@@ -32,7 +33,12 @@ function App() {
         {fetchingState && <Spinner animation='border' />}
         {errorState && 'Retry please'}
       </button>
+
       <ToastError isError={errorState} />
+
+      <div>
+        <BadButton />
+      </div>
     </div>
   );
 }
