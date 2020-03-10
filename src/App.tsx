@@ -1,43 +1,51 @@
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-import React from 'react';
 import { useMachine } from '@xstate/react';
-import { Spinner } from 'react-bootstrap';
+import React from 'react';
 
-import machine, { Context, Event } from './core/machine';
-import ToastError from './components/Toast';
+import styles from './App.module.css';
 import BadButton from './components/BadButton';
+import Button from './components/Button';
+import CharacterCard from './components/CharacterCard';
+import Loader from './components/Loader';
+import machine, { Context, Event } from './core/machine';
 
 function App() {
   const [current, send] = useMachine<Context, Event>(machine, {
     devTools: true
   });
 
-  const fetchingState = current.matches('fetching');
-  const errorState = current.matches('error');
+  const fetchingState: boolean = current.matches("fetching");
+  const errorState: boolean = current.matches("error");
+
+  const character = current.context.characters[1];
 
   return (
-    <div className='App'>
+    <div className={styles.App}>
       <div>
         <h2>
           current state: <span>{current.value}</span>
         </h2>
       </div>
-      <button
-        className='Button'
-        disabled={fetchingState}
-        onClick={() => (errorState ? send('RETRY') : send('CLICK'))}
-      >
-        {!fetchingState && !errorState && 'Fetch data'}
-        {fetchingState && <Spinner animation='border' />}
-        {errorState && 'Retry please'}
-      </button>
+      <div className={styles.group_button}>
+        <Button
+          disabled={fetchingState}
+          onClick={() => (errorState ? send("RETRY") : send("FETCH"))}
+        >
+          {fetchingState && (
+            <span style={{ marginRight: 10 }}>
+              <Loader />
+            </span>
+          )}
+          {!errorState && "Good button"}
+          {errorState && "Retry please"}
+        </Button>
 
-      <ToastError isError={errorState} />
+        {/* <ToastError isError={errorState} /> */}
 
-      <div>
         <BadButton />
+      </div>
+
+      <div style={{ marginTop: "100px" }}>
+        {character && <CharacterCard {...character} />}
       </div>
     </div>
   );

@@ -1,10 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { assign, DoneInvokeEvent, EventObject, Machine } from 'xstate';
 
-import { getCharacters } from '../../services/api';
+import { getError } from '../../services/api';
+
+interface Character {
+  id: number;
+  name: string;
+  status: string;
+  species: string;
+  type: string;
+  gender: string;
+  image: string;
+}
 
 export interface Context {
-  characters: [];
+  characters: Character[];
 }
 
 export interface Schema {
@@ -12,39 +22,45 @@ export interface Schema {
     idle: {};
     fetching: {};
     error: {};
+    success: {};
   };
 }
 
 export interface Event extends EventObject {
-  type: 'CLICK' | 'RETRY';
+  type: "FETCH" | "RETRY";
 }
 
 export default Machine<Context, Schema, Event>(
   {
-    id: 'machine',
-    initial: 'idle',
+    id: "machine",
+    initial: "idle",
     context: {
       characters: []
     },
     states: {
       idle: {
         on: {
-          CLICK: 'fetching'
+          FETCH: "fetching"
         }
       },
       fetching: {
         invoke: {
-          src: () => getCharacters(),
+          src: () => getError(),
           onDone: {
-            target: 'idle',
-            actions: 'assignCharacters'
+            target: "success",
+            actions: "assignCharacters"
           },
-          onError: 'error'
+          onError: "error"
         }
       },
       error: {
         on: {
-          RETRY: 'fetching'
+          RETRY: "fetching"
+        }
+      },
+      success: {
+        on: {
+          FETCH: "fetching"
         }
       }
     }

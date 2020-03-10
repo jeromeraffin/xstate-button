@@ -1,11 +1,14 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+
 import { getCharacters } from '../services/api';
 
 export default function BadButton() {
   return (
-    <Button variant='outline-primary' onClick={() => getCharacters()}>
+    <button
+      style={{ height: 34, marginLeft: 30 }}
+      onClick={() => getCharacters()}
+    >
       Bad Buton
-    </Button>
+    </button>
   );
 }
